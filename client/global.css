@@ -1,0 +1,356 @@
+/** @import must precede all other statements */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Tailwind CSS theme
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+  */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 20 95% 55%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 24 100% 95%;
+    --accent-foreground: 20 95% 35%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 24 100% 88%;
+    --primary-foreground: 20 95% 15%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 20 95% 25%;
+    --accent-foreground: 24 100% 95%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+/* Custom scroll behavior for map application */
+@layer utilities {
+  /* Prevent scroll chaining between filter and map areas */
+  .scroll-container {
+    overscroll-behavior: contain;
+  }
+  
+  /* Smooth scrolling for filter areas */
+  .filter-scroll {
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+  }
+  
+  /* Map container should not scroll with parent */
+  .map-container {
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  /* Map Container Styles */
+  .map-container {
+    @apply relative w-full h-full;
+  }
+
+  .map-container .leaflet-container {
+    @apply w-full h-full;
+  }
+
+  /* Boundary Styling */
+  .boundary-layer {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .boundary-hover {
+    @apply shadow-lg;
+  }
+
+  .boundary-selected {
+    @apply ring-2 ring-green-500 ring-opacity-75;
+  }
+
+  /* Custom Popup Styling */
+  .custom-popup .leaflet-popup-content-wrapper {
+    @apply rounded-lg shadow-xl border-0;
+  }
+
+  .custom-popup .leaflet-popup-content {
+    @apply m-0 p-0;
+  }
+
+  .custom-popup .leaflet-popup-tip {
+    @apply border-gray-200;
+  }
+
+  /* Zoom Controls Enhancement */
+  .leaflet-control-zoom {
+    @apply shadow-lg border-0;
+  }
+
+  .leaflet-control-zoom a {
+    @apply bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-200;
+  }
+
+  .leaflet-control-zoom a:hover {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  /* Boundary Info Overlay */
+  .boundary-info-overlay {
+    @apply bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200;
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .boundary-info-overlay:hover {
+    @apply bg-white shadow-2xl;
+  }
+
+  /* Filter Scroll Enhancement */
+  .filter-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f3f4f6;
+  }
+
+  .filter-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .filter-scroll::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+  }
+
+  .filter-scroll::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .filter-scroll::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  /* Mobile Map Enhancements */
+  @media (max-width: 1024px) {
+    .map-container {
+      @apply h-96;
+    }
+    
+    .boundary-info-overlay {
+      @apply max-w-[200px] text-xs;
+    }
+  }
+
+  /* Desktop Map Enhancements */
+  @media (min-width: 1024px) {
+    .map-container {
+      @apply h-full;
+    }
+    
+    .boundary-info-overlay {
+      @apply max-w-xs text-sm;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-md;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Leaflet popup custom styling */
+  .leaflet-popup-content-wrapper {
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .leaflet-popup-tip {
+    box-shadow: none !important;
+  }
+
+  /* Custom styles for better mobile experience */
+  @media (max-width: 768px) {
+    .leaflet-control-container {
+      font-size: 14px;
+    }
+
+    .leaflet-popup-content {
+      margin: 8px 12px 8px 12px !important;
+    }
+
+    /* Mobile-specific improvements */
+    .leaflet-control-zoom {
+      margin-left: 10px !important;
+      margin-top: 60px !important;
+    }
+
+    /* Mobile table improvements */
+    .table-mobile {
+      font-size: 12px;
+    }
+
+    /* Mobile navigation improvements */
+    .nav-mobile {
+      padding: 0.5rem;
+    }
+  }
+
+  /* Tablet optimizations */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .leaflet-control-zoom {
+      margin-top: 10px !important;
+    }
+  }
+
+  /* High DPI displays (Retina, etc.) */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .leaflet-control-zoom a {
+      font-size: 16px !important;
+    }
+  }
+
+  /* iOS Safari specific fixes */
+  @supports (-webkit-touch-callout: none) {
+    .ios-safe-area {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Fix iOS viewport issues */
+    .map-container {
+      height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Android Chrome specific fixes */
+  @media screen and (max-width: 767px) {
+    .android-nav-fix {
+      min-height: calc(100vh - 56px);
+    }
+  }
+
+  /* Loading animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-business {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .bg-gradient-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+
+  .bg-gradient-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+}

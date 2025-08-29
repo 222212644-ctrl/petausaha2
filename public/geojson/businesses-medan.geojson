@@ -1,0 +1,305 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "1",
+        "nama_usaha": "Restoran Padang Sederhana",
+        "alamat": "Jl. Gatot Subroto No. 123, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Restoran dan Rumah Makan",
+        "kecamatan": "Medan Barat",
+        "kelurahan_desa": "Ganting",
+        "sls": "SLS 001",
+        "blok_sensus": "BS 001",
+        "telepon": "+62 61 8456789",
+        "sumber_data": "Google Maps"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6722, 3.5952]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "2",
+        "nama_usaha": "Toko Elektronik Maju Jaya",
+        "alamat": "Jl. Brigjen Katamso No. 45, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perdagangan Eceran Peralatan Elektronik",
+        "kecamatan": "Medan Petisah",
+        "kelurahan_desa": "Petisah Tengah",
+        "sls": "SLS 002",
+        "blok_sensus": "BS 002",
+        "telepon": "+62 61 8234567",
+        "sumber_data": "SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6850, 3.5890]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "3",
+        "nama_usaha": "Warung Kopi Aceh",
+        "alamat": "Jl. Sei Deli No. 67, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Kedai Kopi, Minuman dan Sejenisnya",
+        "kecamatan": "Medan Helvetia",
+        "kelurahan_desa": "Helvetia",
+        "sls": "SLS 003",
+        "blok_sensus": "BS 003",
+        "telepon": "+62 61 8567890",
+        "sumber_data": "Matching Google Maps + SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6500, 3.6100]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "4",
+        "nama_usaha": "Bengkel Motor Cahaya",
+        "alamat": "Jl. Kapten Muslih No. 89, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Reparasi dan Perawatan Kendaraan Bermotor",
+        "kecamatan": "Medan Sunggal",
+        "kelurahan_desa": "Simpang Tanjung",
+        "sls": "SLS 004",
+        "blok_sensus": "BS 004",
+        "telepon": "+62 61 8678901",
+        "sumber_data": "Google Maps"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6600, 3.5800]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "5",
+        "nama_usaha": "Salon Kecantikan Sari",
+        "alamat": "Jl. Pemuda No. 234, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Salon Kecantikan dan Perawatan Tubuh",
+        "kecamatan": "Medan Timur",
+        "kelurahan_desa": "Pulo Brayan",
+        "sls": "SLS 005",
+        "blok_sensus": "BS 005",
+        "telepon": "+62 61 8789012",
+        "sumber_data": "SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6750, 3.5950]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "6",
+        "nama_usaha": "Toko Pakaian Fashion Point",
+        "alamat": "Jl. Asia No. 156, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perdagangan Eceran Tekstil dan Pakaian",
+        "kecamatan": "Medan Kota",
+        "kelurahan_desa": "Kesawan",
+        "sls": "SLS 006",
+        "blok_sensus": "BS 006",
+        "telepon": "+62 61 8890123",
+        "sumber_data": "Matching Google Maps + SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6900, 3.6000]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "7",
+        "nama_usaha": "Apotek Sehat Sentosa",
+        "alamat": "Jl. Kartini No. 78, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perdagangan Eceran Farmasi",
+        "kecamatan": "Medan Barat",
+        "kelurahan_desa": "Kampung Baru",
+        "sls": "SLS 007",
+        "blok_sensus": "BS 007",
+        "telepon": "+62 61 8901234",
+        "sumber_data": "Google Maps"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6650, 3.5750]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "8",
+        "nama_usaha": "Warung Internet Gaming Zone",
+        "alamat": "Jl. Sisingamangaraja No. 321, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Jasa Teknologi Informasi Lainnya",
+        "kecamatan": "Medan Petisah",
+        "kelurahan_desa": "Sei Agul",
+        "sls": "SLS 008",
+        "blok_sensus": "BS 008",
+        "telepon": "+62 61 8012345",
+        "sumber_data": "SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6550, 3.6050]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "9",
+        "nama_usaha": "Toko Bangunan Berkah",
+        "alamat": "Jl. Veteran No. 445, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perdagangan Eceran Bahan Bangunan",
+        "kecamatan": "Medan Helvetia",
+        "kelurahan_desa": "Tanjung Gusta",
+        "sls": "SLS 009",
+        "blok_sensus": "BS 009",
+        "telepon": "+62 61 8123456",
+        "sumber_data": "Matching Google Maps + SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6800, 3.5850]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "10",
+        "nama_usaha": "Laundry Express 24 Jam",
+        "alamat": "Jl. Prof. HM Yamin No. 567, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Jasa Pencucian dan Pembersihan Tekstil",
+        "kecamatan": "Medan Timur",
+        "kelurahan_desa": "Simpang Limun",
+        "sls": "SLS 010",
+        "blok_sensus": "BS 010",
+        "telepon": "+62 61 8234567",
+        "sumber_data": "Google Maps"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6700, 3.5900]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "11",
+        "nama_usaha": "Rumah Makan Batak",
+        "alamat": "Jl. Jamin Ginting No. 234, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Restoran dan Rumah Makan",
+        "kecamatan": "Medan Johor",
+        "kelurahan_desa": "Gedung Johor",
+        "sls": "SLS 011",
+        "blok_sensus": "BS 011",
+        "telepon": "+62 61 8345678",
+        "sumber_data": "SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6650, 3.6150]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "12",
+        "nama_usaha": "Minimarket Sinar Jaya",
+        "alamat": "Jl. Letda Sujono No. 12, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perdagangan Eceran di Toko Non-Khusus",
+        "kecamatan": "Medan Denai",
+        "kelurahan_desa": "Denai",
+        "sls": "SLS 012",
+        "blok_sensus": "BS 012",
+        "telepon": "+62 61 8456789",
+        "sumber_data": "Matching Google Maps + SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.7000, 3.6200]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "13",
+        "nama_usaha": "Bank BCA Cabang Medan",
+        "alamat": "Jl. Sudirman No. 123, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perantara Keuangan Lainnya",
+        "kecamatan": "Medan Kota",
+        "kelurahan_desa": "Kesawan",
+        "sls": "SLS 013",
+        "blok_sensus": "BS 013",
+        "telepon": "+62 61 8567890",
+        "sumber_data": "Google Maps"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6950, 3.6050]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "14",
+        "nama_usaha": "Hotel Grand Palace",
+        "alamat": "Jl. Imam Bonjol No. 456, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Hotel",
+        "kecamatan": "Medan Petisah",
+        "kelurahan_desa": "Petisah Tengah",
+        "sls": "SLS 014",
+        "blok_sensus": "BS 014",
+        "telepon": "+62 61 8678901",
+        "sumber_data": "SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6850, 3.5950]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "15",
+        "nama_usaha": "SPBU Pertamina",
+        "alamat": "Jl. Gatot Subroto No. 789, Medan",
+        "jenis_peta": "prelist",
+        "kbli_kategori": "Perdagangan Eceran Bahan Bakar",
+        "kecamatan": "Medan Barat",
+        "kelurahan_desa": "Ganting",
+        "sls": "SLS 015",
+        "blok_sensus": "BS 015",
+        "telepon": "+62 61 8789012",
+        "sumber_data": "Matching Google Maps + SBR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [98.6750, 3.5850]
+      }
+    }
+  ]
+}
