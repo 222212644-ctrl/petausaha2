@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Building2, Map, FileSpreadsheet, Menu, X } from 'lucide-react';
+import { Map, FileSpreadsheet, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
@@ -18,15 +18,28 @@ export default function Navigation() {
         <div className="flex justify-between h-14 sm:h-16">
           <div className="flex items-center">
             <Link to="/peta-usaha" className="flex items-center space-x-2 sm:space-x-3">
-              <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-1.5 sm:p-2 rounded-lg">
-                <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-              </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">SIRANTAU Medan</h1>
-                <p className="text-xs text-gray-500">Sistem Informasi Pemetaan Usaha Kota Medan</p>
+                <div className="flex items-center space-x-2">
+                  <img 
+                    src="/img/Sirantau.png" 
+                    alt="Sirantau Logo" 
+                    className="h-12 w-auto"
+                  />
+                  <div>
+                    <h1 className="text-lg sm:text-xl font-bold text-gray-900">Sirantau</h1>
+                    <p className="text-xs text-gray-500">Sistem Informasi Pemetaan Usaha Kota Medan</p>
+                  </div>
+                </div>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-base font-bold text-gray-900">SIRANTAU Medan</h1>
+                <div className="flex items-center space-x-2">
+                  <img 
+                    src="/img/Sirantau.png" 
+                    alt="Sirantau Logo" 
+                    className="h-10 w-auto"
+                  />
+                  <h1 className="text-base font-bold text-gray-900">Sirantau</h1>
+                </div>
               </div>
             </Link>
           </div>
