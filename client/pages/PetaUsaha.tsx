@@ -263,7 +263,32 @@ export default function PetaUsaha() {
     setSelectedBusiness(null);
   };
 
-
+  // Navigate to business on map
+  const navigateToBusiness = (business: Business) => {
+    setMapCenter(business.coordinates);
+    setMapZoom(16);
+    setSelectedBusiness(business);
+    
+    // Smooth zoom to business location
+    if (mapRef.current) {
+      mapRef.current.setView(business.coordinates, 16, {
+        animate: true,
+        duration: 1.2,
+        easeLinearity: 0.25
+      });
+    }
+    
+    // Auto-update filters based on selected business
+    setFilters({
+      jenis_peta: business.jenis_peta,
+      kbli_kategori: business.kbli_kategori,
+      kecamatan: business.kecamatan,
+      kelurahan_desa: business.kelurahan_desa,
+      area_unit: 'sls',
+      area_value: business.sls,
+      sumber_data: business.sumber_data
+    });
+  };
 
   // Get unique values for dropdown options based on current filters (hierarchical)
   const getFilteredOptions = (field: keyof Business, dependsOn?: keyof Filters): string[] => {
@@ -327,7 +352,26 @@ export default function PetaUsaha() {
   const [visibleDesa, setVisibleDesa] = useState<BoundaryFeature[] | null>(null);
   const visibleDesaTimer = useRef<number | null>(null);
 
-
+  const updateVisibleDesa = () => {
+    if (!desaData || !mapRef.current) {
+      setVisibleDesa(null);
+      return;
+    }
+    try {
+      const bounds = mapRef.current.getBounds();
+      const features = desaData.features.filter(f => {
+        try {
+          const fb = L.geoJSON((f as any).geometry as any).getBounds();
+          return bounds.intersects(fb);
+        } catch {
+          return false;
+        }
+      });
+      setVisibleDesa(features);
+    } catch {
+      setVisibleDesa(null);
+    }
+  };
 
   const scheduleUpdateVisibleDesa = () => {
     if (visibleDesaTimer.current) window.clearTimeout(visibleDesaTimer.current);
@@ -348,7 +392,26 @@ export default function PetaUsaha() {
   const [visibleSls, setVisibleSls] = useState<BoundaryFeature[] | null>(null);
   const visibleSlsTimer = useRef<number | null>(null);
 
-
+  const updateVisibleSls = () => {
+    if (!slsData || !mapRef.current) {
+      setVisibleSls(null);
+      return;
+    }
+    try {
+      const bounds = mapRef.current.getBounds();
+      const features = slsData.features.filter(f => {
+        try {
+          const fb = L.geoJSON((f as any).geometry as any).getBounds();
+          return bounds.intersects(fb);
+        } catch {
+          return false;
+        }
+      });
+      setVisibleSls(features);
+    } catch {
+      setVisibleSls(null);
+    }
+  };
 
   const scheduleUpdateVisibleSls = () => {
     if (visibleSlsTimer.current) window.clearTimeout(visibleSlsTimer.current);
@@ -489,7 +552,50 @@ export default function PetaUsaha() {
     } as any;
   }, [boundaryData]);
 
+  // Handle boundary selection from filter (kecamatan | kelurahan)
+  const handleBoundarySelection = (boundaryType: 'kecamatan' | 'kelurahan', value: string) => {
+    // reset when selecting "all"
+    if (value === 'all') {
+      setCurrentBoundary(null);
+      // optionally reset level to kecamatan
+      setCurrentBoundaryLevel('kecamatan');
+      return;
+    }
 
+    if (!mapRef.current) return;
+
+    let selectedBoundary: BoundaryFeature | undefined;
+
+    if (boundaryType === 'kecamatan') {
+      if (!boundaryData) return;
+      selectedBoundary = boundaryData.features.find(f => String(f.properties.nmkec) === value);
+      if (selectedBoundary) {
+        setCurrentBoundaryLevel('kecamatan');
+        setCurrentBoundary(selectedBoundary);
+      }
+    } else {
+      if (!desaData) return;
+      selectedBoundary = desaData.features.find(f => String(f.properties.nmdesa) === value);
+      if (selectedBoundary) {
+        setCurrentBoundaryLevel('desa');
+        setCurrentBoundary(selectedBoundary);
+      }
+    }
+
+    if (selectedBoundary) {
+      try {
+        const bounds = L.geoJSON((selectedBoundary as any).geometry as any).getBounds();
+        mapRef.current.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: boundaryType === 'kelurahan' ? 16 : 13,
+          animate: true,
+          duration: 0.8
+        });
+      } catch (err) {
+        console.error('Error fitting bounds for selected boundary:', err);
+      }
+    }
+  };
 
   // --- NEW: helper to format title/subtitle for boundary overlay (supports kecamatan/desa/sls) ---
   const getBoundaryInfo = (b: BoundaryFeature | null) => {
@@ -523,198 +629,6 @@ export default function PetaUsaha() {
     if (p.nmkec) extraParts.push(`Kec: ${p.nmkec}`);
     const extra = extraParts.join(' • ');
     return { title, typeLabel, extra };
-  };
-
-  // --- NEW: Utility functions for boundary validation and error handling ---
-  const validateBoundaryData = (data: any): boolean => {
-    try {
-      return data && 
-             data.type === 'FeatureCollection' && 
-             Array.isArray(data.features) && 
-             data.features.length > 0 &&
-             data.features.every((f: any) => f.geometry && f.properties);
-    } catch {
-      return false;
-    }
-  };
-
-  const safeGeoJSONBounds = (geometry: any): L.LatLngBounds | null => {
-    try {
-      return L.geoJSON(geometry as any).getBounds();
-    } catch {
-      return null;
-    }
-  };
-
-  const safeMapView = (map: L.Map, center: [number, number], zoom: number, animate: boolean = true) => {
-    try {
-      if (animate) {
-        map.setView(center, zoom, {
-          animate: true,
-          duration: 1.2,
-          easeLinearity: 0.25
-        });
-      } else {
-        map.setView(center, zoom);
-      }
-    } catch (error) {
-      console.error('Error setting map view:', error);
-      // Fallback to immediate view change
-      try {
-        map.setView(center, zoom);
-      } catch (fallbackError) {
-        console.error('Fallback map view also failed:', fallbackError);
-      }
-    }
-  };
-
-  const safeFitBounds = (map: L.Map, bounds: L.LatLngBounds, options: any = {}) => {
-    try {
-      map.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: options.maxZoom || 16,
-        animate: true,
-        duration: 0.8,
-        ...options
-      });
-    } catch (error) {
-      console.error('Error fitting bounds:', error);
-      // Fallback: center on bounds center
-      try {
-        const center = bounds.getCenter();
-        safeMapView(map, [center.lat, center.lng], map.getZoom(), false);
-      } catch (fallbackError) {
-        console.error('Fallback centering also failed:', fallbackError);
-      }
-    }
-  };
-
-  // --- Enhanced boundary selection with better error handling ---
-  const handleBoundarySelection = (boundaryType: 'kecamatan' | 'kelurahan', value: string) => {
-    try {
-      // Reset when selecting "all"
-      if (value === 'all') {
-        setCurrentBoundary(null);
-        setCurrentBoundaryLevel('kecamatan');
-        return;
-      }
-
-      if (!mapRef.current) {
-        console.warn('Map not ready for boundary selection');
-        return;
-      }
-
-      let selectedBoundary: BoundaryFeature | undefined;
-
-      if (boundaryType === 'kecamatan') {
-        if (!boundaryData || !validateBoundaryData(boundaryData)) {
-          console.warn('Kecamatan boundary data not available or invalid');
-          return;
-        }
-        selectedBoundary = boundaryData.features.find(f => String(f.properties.nmkec) === value);
-        if (selectedBoundary) {
-          setCurrentBoundaryLevel('kecamatan');
-          setCurrentBoundary(selectedBoundary);
-        }
-      } else {
-        if (!desaData || !validateBoundaryData(desaData)) {
-          console.warn('Desa boundary data not available or invalid');
-          return;
-        }
-        selectedBoundary = desaData.features.find(f => String(f.properties.nmdesa) === value);
-        if (selectedBoundary) {
-          setCurrentBoundaryLevel('desa');
-          setCurrentBoundary(selectedBoundary);
-        }
-      }
-
-      if (selectedBoundary) {
-        const bounds = safeGeoJSONBounds(selectedBoundary.geometry);
-        if (bounds) {
-          safeFitBounds(mapRef.current, bounds, {
-            maxZoom: boundaryType === 'kelurahan' ? 16 : 13
-          });
-        } else {
-          console.warn('Could not calculate bounds for selected boundary');
-        }
-      }
-    } catch (error) {
-      console.error('Error in boundary selection:', error);
-    }
-  };
-
-  // --- Enhanced navigation to business with better error handling ---
-  const navigateToBusiness = (business: Business) => {
-    try {
-      setMapCenter(business.coordinates);
-      setMapZoom(16);
-      setSelectedBusiness(business);
-      
-      // Smooth zoom to business location with error handling
-      if (mapRef.current) {
-        safeMapView(mapRef.current, business.coordinates, 16, true);
-      }
-      
-      // Auto-update filters based on selected business
-      setFilters({
-        jenis_peta: business.jenis_peta,
-        kbli_kategori: business.kbli_kategori,
-        kecamatan: business.kecamatan,
-        kelurahan_desa: business.kelurahan_desa,
-        area_unit: 'sls',
-        area_value: business.sls,
-        sumber_data: business.sumber_data
-      });
-    } catch (error) {
-      console.error('Error navigating to business:', error);
-    }
-  };
-
-  // --- Enhanced visible boundary updates with better error handling ---
-  const updateVisibleDesa = () => {
-    if (!desaData || !mapRef.current || !validateBoundaryData(desaData)) {
-      setVisibleDesa(null);
-      return;
-    }
-    
-    try {
-      const bounds = mapRef.current.getBounds();
-      const features = desaData.features.filter(f => {
-        try {
-          const featureBounds = safeGeoJSONBounds(f.geometry);
-          return featureBounds ? bounds.intersects(featureBounds) : false;
-        } catch {
-          return false;
-        }
-      });
-      setVisibleDesa(features);
-    } catch (error) {
-      console.error('Error updating visible desa:', error);
-      setVisibleDesa(null);
-    }
-  };
-
-  const updateVisibleSls = () => {
-    if (!slsData || !mapRef.current || !validateBoundaryData(slsData)) {
-      setVisibleSls(null);
-      return;
-    }
-    
-    try {
-      const bounds = mapRef.current.getBounds();
-      const features = slsData.features.filter(f => {
-        try {
-          const featureBounds = safeGeoJSONBounds(f.geometry);
-          return featureBounds ? bounds.intersects(featureBounds) : false;
-        } catch {
-          return false;
-        }
-      });
-      setVisibleSls(features);
-    } catch (error) {
-      console.error('Error updating visible SLS:', error);
-      setVisibleSls(null);
-    }
   };
 
   if (loading) {
@@ -1454,7 +1368,7 @@ export default function PetaUsaha() {
           <div className="flex-1 relative overflow-hidden map-container">
             {/* Boundary Info Overlay */}
             {displayBoundary && (
-              <div className="absolute top-4 right-4 z-[1000] boundary-info-overlay p-3 max-w-xs transition-all duration-300 ease-in-out">
+              <div className="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 max-w-xs transition-all duration-300 ease-in-out">
                 {(() => {
                   const info = getBoundaryInfo(displayBoundary);
                   return (
