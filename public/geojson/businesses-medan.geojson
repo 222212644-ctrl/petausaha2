@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "properties": [
+    ["id","nama_usaha","alamat","jenis_peta","kbli_kategori","kecamatan","kelurahan_desa","sls","blok_sensus","telepon","sumber_data"],
+    ["1","Restoran Padang Sederhana","Jl. Gatot Subroto No. 123, Medan","prelist","Restoran dan Rumah Makan","Medan Barat","Ganting","SLS 001","BS 001","+62 61 8456789","Google Maps"],
+    ["2","Toko Elektronik Maju Jaya","Jl. Brigjen Katamso No. 45, Medan","prelist","Perdagangan Eceran Peralatan Elektronik","Medan Petisah","Petisah Tengah","SLS 002","BS 002","+62 61 8234567","SBR"],
+    ["3","Warung Kopi Aceh","Jl. Sei Deli No. 67, Medan","prelist","Kedai Kopi, Minuman dan Sejenisnya","Medan Helvetia","Helvetia","SLS 003","BS 003","+62 61 8567890","Matching Google Maps + SBR"],
+    ["4","Bengkel Motor Cahaya","Jl. Kapten Muslih No. 89, Medan","prelist","Reparasi dan Perawatan Kendaraan Bermotor","Medan Sunggal","Simpang Tanjung","SLS 004","BS 004","+62 61 8678901","Google Maps"],
+    ["5","Salon Kecantikan Sari","Jl. Pemuda No. 234, Medan","prelist","Salon Kecantikan dan Perawatan Tubuh","Medan Timur","Pulo Brayan","SLS 005","BS 005","+62 61 8789012","SBR"],
+    ["6","Toko Pakaian Fashion Point","Jl. Asia No. 156, Medan","prelist","Perdagangan Eceran Tekstil dan Pakaian","Medan Kota","Kesawan","SLS 006","BS 006","+62 61 8890123","Matching Google Maps + SBR"],
+    ["7","Apotek Sehat Sentosa","Jl. Kartini No. 78, Medan","prelist","Perdagangan Eceran Farmasi","Medan Barat","Kampung Baru","SLS 007","BS 007","+62 61 8901234","Google Maps"],
+    ["8","Warung Internet Gaming Zone","Jl. Sisingamangaraja No. 321, Medan","prelist","Jasa Teknologi Informasi Lainnya","Medan Petisah","Sei Agul","SLS 008","BS 008","+62 61 8012345","SBR"],
+    ["9","Toko Bangunan Berkah","Jl. Veteran No. 445, Medan","prelist","Perdagangan Eceran Bahan Bangunan","Medan Helvetia","Tanjung Gusta","SLS 009","BS 009","+62 61 8123456","Matching Google Maps + SBR"],
+    ["10","Laundry Express 24 Jam","Jl. Prof. HM Yamin No. 567, Medan","prelist","Jasa Pencucian dan Pembersihan Tekstil","Medan Timur","Simpang Limun","SLS 010","BS 010","+62 61 8234567","Google Maps"],
+    ["11","Rumah Makan Batak","Jl. Jamin Ginting No. 234, Medan","prelist","Restoran dan Rumah Makan","Medan Johor","Gedung Johor","SLS 011","BS 011","+62 61 8345678","SBR"],
+    ["12","Minimarket Sinar Jaya","Jl. Letda Sujono No. 12, Medan","prelist","Perdagangan Eceran di Toko Non-Khusus","Medan Denai","Denai","SLS 012","BS 012","+62 61 8456789","Matching Google Maps + SBR"],
+    ["13","Bank BCA Cabang Medan","Jl. Sudirman No. 123, Medan","prelist","Perantara Keuangan Lainnya","Medan Kota","Kesawan","SLS 013","BS 013","+62 61 8567890","Google Maps"],
+    ["14","Hotel Grand Palace","Jl. Imam Bonjol No. 456, Medan","prelist","Hotel","Medan Petisah","Petisah Tengah","SLS 014","BS 014","+62 61 8678901","SBR"],
+    ["15","SPBU Pertamina","Jl. Gatot Subroto No. 789, Medan","prelist","Perdagangan Eceran Bahan Bakar","Medan Barat","Ganting","SLS 015","BS 015","+62 61 8789012","Matching Google Maps + SBR"]
+  ],
+  "geometry": [
+    [98.6722,3.5952],
+    [98.6850,3.5890],
+    [98.6500,3.6100],
+    [98.6600,3.5800],
+    [98.6750,3.5950],
+    [98.6900,3.6000],
+    [98.6650,3.5750],
+    [98.6550,3.6050],
+    [98.6800,3.5850],
+    [98.6700,3.5900],
+    [98.6650,3.6150],
+    [98.7000,3.6200],
+    [98.6950,3.6050],
+    [98.6850,3.5950],
+    [98.6750,3.5850]
+  ]
+}
