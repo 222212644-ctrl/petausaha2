@@ -81,9 +81,9 @@ export default function ExportTabel() {
   });
 
   const kecamatanList = useMemo(() => [
-    'AMPLAS', 'AREA', 'BARAT', 'BARU', 'BELAWAN', 'DELI', 'DENAI', 'HELVETIA', 'JOHOR', 'KOTA',
-    'LABUHAN', 'MAIMUN', 'MARELAN', 'PERJUANGAN', 'PETISAH', 'POLONIA', 'SUNGGAL', 'TEMBUNG', 'TIMUR',
-    'TUNTUNGAN', 'SELAYANG'
+    'MEDAN AMPLAS', 'MEDAN AREA', 'MEDAN BARAT', 'MEDAN BARU', 'MEDAN BELAWAN', 'MEDAN DELI', 'MEDAN DENAI', 'MEDAN HELVETIA', 'MEDAN JOHOR', 'MEDAN KOTA',
+    'MEDAN LABUHAN', 'MEDAN MAIMUN', 'MEDAN MARELAN', 'MEDAN PERJUANGAN', 'MEDAN PETISAH', 'MEDAN POLONIA', 'MEDAN SUNGGAL', 'MEDAN TEMBUNG', 'MEDAN TIMUR',
+    'MEDAN TUNTUNGAN', 'MEDAN SELAYANG'
   ], []);
 
   // New useEffect to fetch data based on selected kecamatan
@@ -101,7 +101,7 @@ export default function ExportTabel() {
       setFilteredBusinesses([]);
       
       try {
-        const kecName = filters.kecamatan.replace(/\s+/g, '');
+        const kecName = filters.kecamatan.replace('MEDAN ', '');
         const bizRes = await fetch(`/geojson/MEDAN ${kecName}_output.geojson`);
         
         if (!bizRes.ok) {
