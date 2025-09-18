@@ -38,7 +38,7 @@ export default function Navigation() {
                     alt="Sirantau Logo" 
                     className="h-10 w-auto"
                   />
-                  <h1 className="text-base font-bold text-gray-900">Sirantau</h1>
+                  <h1 className="text-base font-bold text-gray-900">SIRANTAU</h1>
                 </div>
               </div>
             </Link>
