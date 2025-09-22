@@ -12,12 +12,12 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true }));
 
   // Example API routes
-  app.get("/api/ping", (_req, res) => {
+  app.get("/ping", (_req, res) => { // Change from /api/ping to /ping
     const ping = process.env.PING_MESSAGE ?? "ping";
     res.json({ message: ping });
   });
 
-  app.get("/api/demo", handleDemo);
+  app.get("/demo", handleDemo); // Change from /api/demo to /demo
 
   return app;
 }
