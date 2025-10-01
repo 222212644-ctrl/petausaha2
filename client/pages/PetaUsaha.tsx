@@ -82,6 +82,13 @@ interface Filters {
   sumber_data: string;
 }
 
+// Fungsi utilitas untuk menyeragamkan string untuk filtering KBLI
+const normalizeStringForFilter = (str: string) => {
+  if (!str) return '';
+  // Mengubah ke huruf kecil dan menghilangkan karakter yang sering menyebabkan inkonsistensi
+  return str.toLowerCase().replace(/[\s.,/]/g, '').trim();
+};
+
 // Component to handle map navigation
 function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
@@ -138,14 +145,6 @@ function MapController({ center, zoom }: { center: [number, number]; zoom: numbe
   return null;
 }
 
-// Fungsi utilitas untuk menyeragamkan string
-const normalizeStringForFilter = (str: string) => {
-  if (!str) return '';
-  // Mengubah ke huruf kecil, menghilangkan spasi, titik, koma, garis miring, dll.
-  // Ini membuat perbandingan lebih fleksibel terhadap kesalahan ketik minor.
-  return str.toLowerCase().replace(/[\s.,/]/g, '').trim();
-};
-
 export default function PetaUsaha() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
@@ -183,7 +182,7 @@ export default function PetaUsaha() {
     'MEDAN TUNTUNGAN', 'MEDAN SELAYANG'
   ], []);
 
-  // START: FIXED FILTER LISTS SESUAI PERMINTAAN USER
+  // START: FIXED FILTER LISTS
   const kbliKategoriList = useMemo(() => [
     'All',
     'A. Pertanian, Kehutanan dan Perikanan',
@@ -216,7 +215,7 @@ export default function PetaUsaha() {
     'Gmaps + SBR'
   ], []);
   // END: FIXED FILTER LISTS
-  
+
   useEffect(() => {
     const loadStaticData = async () => {
       try {
@@ -331,12 +330,16 @@ export default function PetaUsaha() {
     if (filters.jenis_peta !== 'all') {
       filtered = filtered.filter(b => b.jenis_peta === filters.jenis_peta);
     }
+
+    // START: FILTER KBLI DENGAN NORMALISASI
     if (filters.kbli_kategori !== 'all') {
       const normalizedFilter = normalizeStringForFilter(filters.kbli_kategori);
       filtered = filtered.filter(b => 
         normalizedFilter === normalizeStringForFilter(b.kbli_kategori)
       );
     }
+    // END: FILTER KBLI DENGAN NORMALISASI
+
     if (filters.kelurahan_desa !== 'all') {
       filtered = filtered.filter(b => b.kelurahan_desa === filters.kelurahan_desa);
     }
@@ -344,21 +347,24 @@ export default function PetaUsaha() {
       const areaField = filters.area_unit === 'sls' ? 'sls' : 'blok_sensus';
       filtered = filtered.filter(b => b[areaField] === filters.area_value);
     }
+    
+    // START: FILTER SUMBER DATA DENGAN LOGIKA OR
     if (filters.sumber_data !== 'all') {
       const selectedSource = filters.sumber_data;
       filtered = filtered.filter(b => {
         if (selectedSource === 'Gmaps') {
-          // Jika dipilih Gmaps, tampilkan Gmaps atau Gmaps + SBR
+          // Jika dipilih Gmaps, tampilkan Gmaps ATAU Gmaps + SBR
           return b.sumber_data === 'Gmaps' || b.sumber_data === 'Gmaps + SBR';
         }
         if (selectedSource === 'SBR') {
-          // Jika dipilih SBR, tampilkan SBR atau Gmaps + SBR
+          // Jika dipilih SBR, tampilkan SBR ATAU Gmaps + SBR
           return b.sumber_data === 'SBR' || b.sumber_data === 'Gmaps + SBR';
         }
         // Untuk 'Gmaps + SBR' dan sumber data lainnya, lakukan pencocokan eksak
         return b.sumber_data === selectedSource;
       });
     }
+    // END: FILTER SUMBER DATA DENGAN LOGIKA OR
 
     setFilteredBusinesses(filtered);
     setCurrentPage(1);
@@ -442,9 +448,7 @@ export default function PetaUsaha() {
     setSelectedBusiness(null);
   };
   
-  // NOTE: The removed navigateToBusiness function remains removed.
-
-  // NOTE: getFilteredOptions kini HANYA untuk filter dinamis (lokasi)
+  // getFilteredOptions kini hanya untuk filter dinamis (lokasi dan jenis_peta)
   const getFilteredOptions = (field: keyof Business, dependsOn?: keyof Filters): string[] => {
     let dataToFilter = businesses;
     
@@ -456,14 +460,8 @@ export default function PetaUsaha() {
       if (filters.jenis_peta !== 'all' && field !== 'jenis_peta') {
         dataToFilter = dataToFilter.filter(b => b.jenis_peta === filters.jenis_peta);
       }
-      if (filters.kbli_kategori !== 'all' && !['jenis_peta', 'kbli_kategori'].includes(field as any)) {
-        // Tetap memfilter berdasarkan kategori KBLI yang dipilih
-        dataToFilter = dataToFilter.filter(b => b.kbli_kategori === filters.kbli_kategori);
-      }
-      if (filters.sumber_data !== 'all' && !['jenis_peta', 'kbli_kategori', 'sumber_data'].includes(field as any)) {
-        // Tetap memfilter berdasarkan Sumber Data yang dipilih
-        dataToFilter = dataToFilter.filter(b => b.sumber_data === filters.sumber_data);
-      }
+      // Logika KBLI dan Sumber Data diabaikan karena mereka menggunakan fixed list.
+      // Filter hanya berdasarkan filter yang membatasi pilihan dinamis (misalnya, Kelurahan/Desa membatasi SLS)
       if (filters.kelurahan_desa !== 'all' && field === (filters.area_unit === 'sls' ? 'sls' : 'blok_sensus')) {
         dataToFilter = dataToFilter.filter(b => b.kelurahan_desa === filters.kelurahan_desa);
       }
@@ -837,7 +835,7 @@ export default function PetaUsaha() {
                           value={sumber === 'All' ? 'all' : sumber} 
                           className="text-sm"
                         >
-                          {sumber}
+                          {sumber === 'All' ? '-- All --' : sumber}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -867,7 +865,7 @@ export default function PetaUsaha() {
                           value={kategori === 'All' ? 'all' : kategori} 
                           className="text-sm"
                         >
-                          {kategori}
+                          {kategori === 'All' ? '-- All --' : kategori}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -945,7 +943,6 @@ export default function PetaUsaha() {
         )}
 
         {/* Mobile Business List - always visible on mobile (re-inserted) */}
-        {/* ... (Mobile Business List content remains the same) ... */}
         <div className="p-3 bg-white border-b border-gray-200">
           <Card>
             <CardHeader className="pb-2">
@@ -1003,11 +1000,9 @@ export default function PetaUsaha() {
             )}
           </Card>
         </div>
-        {/* ... (End Mobile Business List content) ... */}
 
         {/* Mobile Map Area */}
         <div className="bg-white border-b border-gray-200 p-3 flex-shrink-0">
-        {/* ... (Mobile Map Area content remains the same) ... */}
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-bold text-gray-900">Peta</h1>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -1018,7 +1013,6 @@ export default function PetaUsaha() {
         </div>
 
         {/* Mobile Map Container */}
-        {/* ... (Mobile Map Container content remains the same) ... */}
         <div className="h-96 flex-shrink-0 map-container relative">
           {/* Boundary Level Indicator - Mobile */}
           <div className="absolute top-2 left-2 z-[1000] bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-2 py-1 transition-all duration-300 ease-in-out">
@@ -1225,7 +1219,7 @@ export default function PetaUsaha() {
 
           {/* Desktop Filter Content */}
           <div className="flex-1 p-4 space-y-4 overflow-y-auto filter-scroll">
-            {/* Search Input - Pindah ke atas */}
+            {/* Search Input */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-orange-700">Cari Usaha</CardTitle>
@@ -1244,7 +1238,7 @@ export default function PetaUsaha() {
               </CardContent>
             </Card>
 
-            {/* Filter Kecamatan - Pindah ke atas */}
+            {/* Filter Kecamatan */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-orange-700">Kecamatan</CardTitle>
@@ -1272,7 +1266,7 @@ export default function PetaUsaha() {
               </CardContent>
             </Card>
 
-            {/* Jenis Peta - desktop (sama seperti mobile) */}
+            {/* Jenis Peta */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-orange-700">Jenis Peta</CardTitle>
@@ -1312,7 +1306,7 @@ export default function PetaUsaha() {
                         value={sumber === 'All' ? 'all' : sumber} 
                         className="text-sm"
                       >
-                        {sumber}
+                        {sumber === 'All' ? '-- All --' : sumber}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1342,7 +1336,7 @@ export default function PetaUsaha() {
                         value={kategori === 'All' ? 'all' : kategori} 
                         className="text-sm"
                       >
-                        {kategori}
+                        {kategori === 'All' ? '-- All --' : kategori}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1418,7 +1412,6 @@ export default function PetaUsaha() {
           </div>
 
           {/* Desktop Business Names List */}
-          {/* ... (Desktop Business Names List content remains the same) ... */}
           <div className="border-t border-gray-200 bg-gray-50 flex flex-col flex-shrink-0" style={{ height: '300px' }}>
             <div className="p-4 pb-2 flex-shrink-0">
               <div className="flex items-center justify-between text-sm">
@@ -1475,11 +1468,9 @@ export default function PetaUsaha() {
               </div>
             )}
           </div>
-          {/* ... (End Desktop Business Names List content) ... */}
         </div>
 
         {/* Desktop Map Area */}
-        {/* ... (Desktop Map Area content remains the same) ... */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Map Header */}
           <div className="bg-white shadow-sm border-b border-gray-200 p-4 flex-shrink-0">
@@ -1688,7 +1679,6 @@ export default function PetaUsaha() {
             </MapContainer>
           </div>
         </div>
-        {/* ... (End Desktop Map Area content) ... */}
       </div>
     </div>
   );

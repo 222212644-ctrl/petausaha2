@@ -76,6 +76,7 @@ export default function ExportTabel() {
   const [itemsPerPage] = useState(10);
   const [sortField, setSortField] = useState<SortField>('nama_usaha');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  // State untuk mengontrol tampilan filter di mobile
   const [filterOpen, setFilterOpen] = useState(false);
 
   const [filters, setFilters] = useState<Filters>({
@@ -94,7 +95,7 @@ export default function ExportTabel() {
     'MEDAN TUNTUNGAN', 'MEDAN SELAYANG'
   ], []);
 
-  // START: FIXED FILTER LISTS DARI PERMINTAAN SEBELUMNYA
+  // START: FIXED FILTER LISTS
   const kbliKategoriList = useMemo(() => [
     'All',
     'A. Pertanian, Kehutanan dan Perikanan',
@@ -128,7 +129,7 @@ export default function ExportTabel() {
   ], []);
   // END: FIXED FILTER LISTS
 
-  // New useEffect to fetch data based on selected kecamatan
+  // useEffect untuk memuat data berdasarkan kecamatan
   useEffect(() => {
     const loadBusinessData = async () => {
       if (filters.kecamatan === 'all') {
@@ -196,6 +197,7 @@ export default function ExportTabel() {
     loadBusinessData();
   }, [filters.kecamatan]);
 
+  // useEffect untuk filtering dan sorting
   useEffect(() => {
     let filtered = businesses;
 
@@ -212,7 +214,7 @@ export default function ExportTabel() {
       );
     }
     
-    // Apply other filters
+    // Apply Jenis Peta filter
     if (filters.jenis_peta !== 'all') {
       filtered = filtered.filter(b => b.jenis_peta === filters.jenis_peta);
     }
@@ -226,11 +228,15 @@ export default function ExportTabel() {
     }
     // END: FILTER KBLI DENGAN NORMALISASI
 
+    // Apply filter Kelurahan/Desa
     if (filters.kelurahan_desa !== 'all') {
       filtered = filtered.filter(b => b.kelurahan_desa === filters.kelurahan_desa);
     }
+    
+    // Apply filter SLS/Blok Sensus
     if (filters.area_value !== 'all') {
       const areaField = filters.area_unit === 'sls' ? 'sls' : 'blok_sensus';
+      // Menggunakan String() untuk memastikan perbandingan tipe data yang sama
       filtered = filtered.filter((business: any) => String(business[areaField]) === filters.area_value);
     }
 
@@ -286,6 +292,7 @@ export default function ExportTabel() {
     setFilters(prev => {
       const newFilters = { ...prev, [key]: value };
 
+      // Reset filter berjenjang ke 'all' saat filter di tingkat atas berubah
       if (key === 'kecamatan') {
         newFilters.jenis_peta = 'all';
         newFilters.kbli_kategori = 'all';
@@ -395,7 +402,7 @@ export default function ExportTabel() {
       : 'bg-blue-100 text-blue-800';
   };
 
-  // getFilteredOptions kini hanya digunakan untuk filter yang dinamis (non-KBLI, non-Sumber Data)
+  // getFilteredOptions kini hanya digunakan untuk filter yang dinamis (lokasi dan jenis_peta)
   const getFilteredOptions = (field: keyof Business, dependsOn?: keyof Filters): string[] => {
     let data = businesses.slice();
 
@@ -403,13 +410,10 @@ export default function ExportTabel() {
       return field === 'kecamatan' ? kecamatanList : [];
     }
 
-    // Hanya memfilter data sebelum mengambil opsi unik,
-    // berdasarkan filter yang mungkin membatasi opsi dinamis (jenis peta, kelurahan/desa)
     if (dependsOn) {
       if (filters.jenis_peta !== 'all' && field !== 'jenis_peta') {
         data = data.filter(b => b.jenis_peta === filters.jenis_peta);
       }
-      // KBLI dan Sumber Data diabaikan di sini karena opsinya fixed.
       if (filters.kecamatan !== 'all' && !['jenis_peta','kecamatan','kelurahan_desa','sls','blok_sensus'].includes(field)) {
         data = data.filter(b => b.kecamatan === filters.kecamatan);
       }
@@ -489,6 +493,7 @@ export default function ExportTabel() {
                 <Filter className="h-5 w-5" />
                 <span>Filter</span>
               </CardTitle>
+              {/* Tombol Toggle Filter untuk Mobile */}
               <Button
                 onClick={() => setFilterOpen(!filterOpen)}
                 variant="outline"
@@ -499,6 +504,7 @@ export default function ExportTabel() {
               </Button>
             </div>
           </CardHeader>
+          {/* CardContent ini berisi filter yang akan ditampilkan di desktop (md:block) atau di mobile (filterOpen) */}
           <CardContent className={`${filterOpen ? 'block' : 'hidden md:block'}`}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-4">
               {/* Filter Kecamatan */}
@@ -517,7 +523,7 @@ export default function ExportTabel() {
                 </SelectContent>
               </Select>
               
-              {/* Filter Jenis Peta (masih dinamis/tergantung kecamatan) */}
+              {/* Filter Jenis Peta */}
               <Select 
                 value={filters.jenis_peta} 
                 onValueChange={(value) => updateFilter('jenis_peta', value)}
@@ -534,7 +540,7 @@ export default function ExportTabel() {
                 </SelectContent>
               </Select>
 
-              {/* START: Filter Sumber Data (FIXED LIST) */}
+              {/* Filter Sumber Data (FIXED LIST - untuk Desktop dan Mobile) */}
               <Select 
                 value={filters.sumber_data} 
                 onValueChange={(value) => updateFilter('sumber_data', value)}
@@ -554,9 +560,8 @@ export default function ExportTabel() {
                    ))}
                 </SelectContent>
               </Select>
-              {/* END: Filter Sumber Data */}
 
-              {/* START: Filter Kategori KBLI (FIXED LIST) */}
+              {/* Filter Kategori KBLI (FIXED LIST - untuk Desktop dan Mobile) */}
               <Select 
                 value={filters.kbli_kategori} 
                 onValueChange={(value) => updateFilter('kbli_kategori', value)}
@@ -577,7 +582,6 @@ export default function ExportTabel() {
                    ))}
                 </SelectContent>
               </Select>
-              {/* END: Filter Kategori KBLI */}
 
               {/* Filter Kelurahan/Desa (dinamis) */}
               <Select 
@@ -791,7 +795,7 @@ export default function ExportTabel() {
                 disabled={currentPage === totalPages}
                 className="text-xs sm:text-sm"
               >
-                <span className="hidden sm:inline mr-1">Selanjutnya</span>
+                <span className="hidden sm:inline ml-1">Selanjutnya</span>
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
