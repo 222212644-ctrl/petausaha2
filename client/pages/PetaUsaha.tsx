@@ -729,9 +729,9 @@ export default function PetaUsaha() {
   const paginatedBusinesses = filteredBusinesses.slice(startIndex, endIndex);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 h-full">
       {/* Mobile Layout - Vertical */}
-      <div className="lg:hidden">
+      <div className="lg:hidden h-full flex flex-col">
         {/* Mobile Filter Toggle */}
         <div className="bg-white border-b border-gray-200 p-4 flex-shrink-0">
           <Button
@@ -1209,7 +1209,7 @@ export default function PetaUsaha() {
       </div>
 
       {/* Desktop Layout - Horizontal */}
-      <div className="hidden lg:flex h-screen overflow-hidden">
+      <div className="hidden lg:flex h-full overflow-hidden">
         {/* Desktop Sidebar */}
         <div className="w-80 bg-white shadow-lg border-r border-gray-200 flex flex-col">
           {/* Desktop Header */}
