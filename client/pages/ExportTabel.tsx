@@ -59,6 +59,14 @@ interface Filters {
 type SortField = 'nama_usaha' | 'jenis_peta' | 'kbli_kategori' | 'kecamatan';
 type SortDirection = 'asc' | 'desc';
 
+// Fungsi utilitas untuk menyeragamkan string untuk filtering KBLI
+const normalizeStringForFilter = (str: string) => {
+  if (!str) return '';
+  // Mengubah ke huruf kecil dan menghilangkan karakter yang sering menyebabkan inkonsistensi
+  return str.toLowerCase().replace(/[\s.,/]/g, '').trim();
+};
+
+
 export default function ExportTabel() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
@@ -85,6 +93,40 @@ export default function ExportTabel() {
     'MEDAN LABUHAN', 'MEDAN MAIMUN', 'MEDAN MARELAN', 'MEDAN PERJUANGAN', 'MEDAN PETISAH', 'MEDAN POLONIA', 'MEDAN SUNGGAL', 'MEDAN TEMBUNG', 'MEDAN TIMUR',
     'MEDAN TUNTUNGAN', 'MEDAN SELAYANG'
   ], []);
+
+  // START: FIXED FILTER LISTS DARI PERMINTAAN SEBELUMNYA
+  const kbliKategoriList = useMemo(() => [
+    'All',
+    'A. Pertanian, Kehutanan dan Perikanan',
+    'B. Pertambangan dan Penggalian',
+    'C. Industri Pengolahan',
+    'D. Pengadaan Listrik, Gas, Uap/Air Panas dan Udara Dingin',
+    'E. Pengadaan Air, Pengelolaan Sampah, Limbah dan Daur Ulang',
+    'F. Konstruksi',
+    'G. Perdagangan Besar dan Eceran, Reparasi Mobil dan Sepeda Motor',
+    'H. Transportasi dan Pergudangan',
+    'I. Penyediaan Akomodasi dan Makan Minum',
+    'J. Informasi dan Komunikasi',
+    'K. Aktivitas Keuangan dan Asuransi',
+    'L. Real Estat',
+    'M. Jasa Profesional, Ilmiah dan Teknis',
+    'N. Jasa Persewaan, Ketenagakerjaan, Agen Perjalanan dan Jasa Pendukung',
+    'O. Administrasi Pemerintahan, Pertahanan dan Jaminan Sosial Wajib',
+    'P. Pendidikan',
+    'Q. Jasa Kesehatan dan Kegiatan Sosial',
+    'R. Kesenian, Hiburan dan Rekreasi',
+    'S. Aktivitas Jasa Lainnya',
+    'T. Jasa Perorangan yang Melayani Rumah Tangga',
+    'U. Kegiatan Badan Internasional dan Badan Ekstra Internasional Lainnya'
+  ], []);
+
+  const sumberDataList = useMemo(() => [
+    'All',
+    'Gmaps',
+    'SBR',
+    'Gmaps + SBR'
+  ], []);
+  // END: FIXED FILTER LISTS
 
   // New useEffect to fetch data based on selected kecamatan
   useEffect(() => {
@@ -174,9 +216,16 @@ export default function ExportTabel() {
     if (filters.jenis_peta !== 'all') {
       filtered = filtered.filter(b => b.jenis_peta === filters.jenis_peta);
     }
+
+    // START: FILTER KBLI DENGAN NORMALISASI
     if (filters.kbli_kategori !== 'all') {
-      filtered = filtered.filter(b => b.kbli_kategori === filters.kbli_kategori);
+      const normalizedFilter = normalizeStringForFilter(filters.kbli_kategori);
+      filtered = filtered.filter(b => 
+        normalizedFilter === normalizeStringForFilter(b.kbli_kategori)
+      );
     }
+    // END: FILTER KBLI DENGAN NORMALISASI
+
     if (filters.kelurahan_desa !== 'all') {
       filtered = filtered.filter(b => b.kelurahan_desa === filters.kelurahan_desa);
     }
@@ -184,9 +233,24 @@ export default function ExportTabel() {
       const areaField = filters.area_unit === 'sls' ? 'sls' : 'blok_sensus';
       filtered = filtered.filter((business: any) => String(business[areaField]) === filters.area_value);
     }
+
+    // START: FILTER SUMBER DATA DENGAN LOGIKA OR
     if (filters.sumber_data !== 'all') {
-      filtered = filtered.filter(b => b.sumber_data === filters.sumber_data);
+      const selectedSource = filters.sumber_data;
+      filtered = filtered.filter(b => {
+        if (selectedSource === 'Gmaps') {
+          // Jika dipilih Gmaps, tampilkan Gmaps ATAU Gmaps + SBR
+          return b.sumber_data === 'Gmaps' || b.sumber_data === 'Gmaps + SBR';
+        }
+        if (selectedSource === 'SBR') {
+          // Jika dipilih SBR, tampilkan SBR ATAU Gmaps + SBR
+          return b.sumber_data === 'SBR' || b.sumber_data === 'Gmaps + SBR';
+        }
+        // Untuk 'Gmaps + SBR' dan sumber data lainnya, lakukan pencocokan eksak
+        return b.sumber_data === selectedSource;
+      });
     }
+    // END: FILTER SUMBER DATA DENGAN LOGIKA OR
 
     // Sort
     filtered.sort((a, b) => {
@@ -331,6 +395,7 @@ export default function ExportTabel() {
       : 'bg-blue-100 text-blue-800';
   };
 
+  // getFilteredOptions kini hanya digunakan untuk filter yang dinamis (non-KBLI, non-Sumber Data)
   const getFilteredOptions = (field: keyof Business, dependsOn?: keyof Filters): string[] => {
     let data = businesses.slice();
 
@@ -338,17 +403,14 @@ export default function ExportTabel() {
       return field === 'kecamatan' ? kecamatanList : [];
     }
 
+    // Hanya memfilter data sebelum mengambil opsi unik,
+    // berdasarkan filter yang mungkin membatasi opsi dinamis (jenis peta, kelurahan/desa)
     if (dependsOn) {
       if (filters.jenis_peta !== 'all' && field !== 'jenis_peta') {
         data = data.filter(b => b.jenis_peta === filters.jenis_peta);
       }
-      if (filters.kbli_kategori !== 'all' && !['jenis_peta','kbli_kategori'].includes(field)) {
-        data = data.filter(b => b.kbli_kategori === filters.kbli_kategori);
-      }
-      if (filters.sumber_data !== 'all' && !['jenis_peta','kbli_kategori','sumber_data'].includes(field)) {
-        data = data.filter(b => b.sumber_data === filters.sumber_data);
-      }
-      if (filters.kecamatan !== 'all' && !['jenis_peta','kbli_kategori','sumber_data','kecamatan'].includes(field)) {
+      // KBLI dan Sumber Data diabaikan di sini karena opsinya fixed.
+      if (filters.kecamatan !== 'all' && !['jenis_peta','kecamatan','kelurahan_desa','sls','blok_sensus'].includes(field)) {
         data = data.filter(b => b.kecamatan === filters.kecamatan);
       }
       if (filters.kelurahan_desa !== 'all' && (field === 'sls' || field === 'blok_sensus')) {
@@ -439,7 +501,7 @@ export default function ExportTabel() {
           </CardHeader>
           <CardContent className={`${filterOpen ? 'block' : 'hidden md:block'}`}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-4">
-              {/* Filter Kecamatan - Pindah ke atas */}
+              {/* Filter Kecamatan */}
               <Select
                 value={filters.kecamatan}
                 onValueChange={(value) => updateFilter('kecamatan', value)}
@@ -455,6 +517,7 @@ export default function ExportTabel() {
                 </SelectContent>
               </Select>
               
+              {/* Filter Jenis Peta (masih dinamis/tergantung kecamatan) */}
               <Select 
                 value={filters.jenis_peta} 
                 onValueChange={(value) => updateFilter('jenis_peta', value)}
@@ -471,85 +534,99 @@ export default function ExportTabel() {
                 </SelectContent>
               </Select>
 
+              {/* START: Filter Sumber Data (FIXED LIST) */}
               <Select 
                 value={filters.sumber_data} 
                 onValueChange={(value) => updateFilter('sumber_data', value)}
                 disabled={isFilterDisabled('sumber_data')}
               >
-                 <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Sumber Data" />
-                 </SelectTrigger>
-                 <SelectContent>
-                    <SelectItem value="all">Semua Sumber Data</SelectItem>
-                    {getFilteredOptions('sumber_data', 'jenis_peta').map(sumber => (
-                      <SelectItem key={sumber} value={sumber}>{sumber}</SelectItem>
-                    ))}
-                 </SelectContent>
-                </Select>
+                <SelectTrigger className="text-sm">
+                   <SelectValue placeholder="Sumber Data" />
+                </SelectTrigger>
+                <SelectContent>
+                   {sumberDataList.map(sumber => (
+                     <SelectItem 
+                       key={sumber} 
+                       value={sumber === 'All' ? 'all' : sumber}
+                     >
+                       {sumber === 'All' ? 'Semua Sumber Data' : sumber}
+                     </SelectItem>
+                   ))}
+                </SelectContent>
+              </Select>
+              {/* END: Filter Sumber Data */}
 
+              {/* START: Filter Kategori KBLI (FIXED LIST) */}
               <Select 
                 value={filters.kbli_kategori} 
                 onValueChange={(value) => updateFilter('kbli_kategori', value)}
                 disabled={isFilterDisabled('kbli_kategori')}
               >
-                 <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Kategori KBLI" />
-                 </SelectTrigger>
-                 <SelectContent>
-                    <SelectItem value="all">Semua Kategori</SelectItem>
-                    {getFilteredOptions('kbli_kategori', 'sumber_data').map(kategori => (
-                      <SelectItem key={kategori} value={kategori} className="text-sm">{kategori}</SelectItem>
-                    ))}
-                 </SelectContent>
-                </Select>
+                <SelectTrigger className="text-sm">
+                   <SelectValue placeholder="Kategori KBLI" />
+                </SelectTrigger>
+                <SelectContent>
+                   {kbliKategoriList.map(kategori => (
+                     <SelectItem 
+                       key={kategori} 
+                       value={kategori === 'All' ? 'all' : kategori} 
+                       className="text-sm"
+                     >
+                       {kategori === 'All' ? 'Semua Kategori' : kategori}
+                     </SelectItem>
+                   ))}
+                </SelectContent>
+              </Select>
+              {/* END: Filter Kategori KBLI */}
 
-                <Select 
+              {/* Filter Kelurahan/Desa (dinamis) */}
+              <Select 
                 value={filters.kelurahan_desa} 
                 onValueChange={(value) => updateFilter('kelurahan_desa', value)}
                 disabled={isFilterDisabled('kelurahan_desa')}
               >
                  <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Kelurahan/Desa" />
+                     <SelectValue placeholder="Kelurahan/Desa" />
                  </SelectTrigger>
                  <SelectContent>
-                    <SelectItem value="all">Semua Kelurahan/Desa</SelectItem>
-                    {getFilteredOptions('kelurahan_desa', 'kecamatan').map(kelurahan => (
-                      <SelectItem key={kelurahan} value={kelurahan}>{kelurahan}</SelectItem>
-                    ))}
+                     <SelectItem value="all">Semua Kelurahan/Desa</SelectItem>
+                     {getFilteredOptions('kelurahan_desa', 'kecamatan').map(kelurahan => (
+                       <SelectItem key={kelurahan} value={kelurahan}>{kelurahan}</SelectItem>
+                     ))}
                  </SelectContent>
-                </Select>
-
-                {/* Area unit + value (SLS / Blok Sensus) */}
-                <Select 
-                value={filters.area_unit} 
-                onValueChange={(value) => updateFilter('area_unit', value as 'sls' | 'blok_sensus')}
-                disabled={isFilterDisabled('area_unit')}
-              >
-                <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Unit Area" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sls">SLS</SelectItem>
-                  <SelectItem value="blok_sensus">Blok Sensus</SelectItem>
-                </SelectContent>
               </Select>
 
+              {/* Area unit + value (SLS / Blok Sensus) - dinamis */}
               <Select 
-                value={filters.area_value} 
-                onValueChange={(value) => updateFilter('area_value', value)}
-                disabled={isFilterDisabled('area_value')}
-              >
-                <SelectTrigger className="text-sm">
-                  <SelectValue placeholder={`Pilih ${filters.area_unit.toUpperCase()}`} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua</SelectItem>
-                  {getFilteredOptions(filters.area_unit === 'sls' ? 'sls' : 'blok_sensus', 'kelurahan_desa').map(a => (
-                    <SelectItem key={a} value={a}>{a}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-             </div>
+              value={filters.area_unit} 
+              onValueChange={(value) => updateFilter('area_unit', value as 'sls' | 'blok_sensus')}
+              disabled={isFilterDisabled('area_unit')}
+            >
+              <SelectTrigger className="text-sm">
+                <SelectValue placeholder="Unit Area" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sls">SLS</SelectItem>
+                <SelectItem value="blok_sensus">Blok Sensus</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select 
+              value={filters.area_value} 
+              onValueChange={(value) => updateFilter('area_value', value)}
+              disabled={isFilterDisabled('area_value')}
+            >
+              <SelectTrigger className="text-sm">
+                <SelectValue placeholder={`Pilih ${filters.area_unit.toUpperCase()}`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua</SelectItem>
+                {getFilteredOptions(filters.area_unit === 'sls' ? 'sls' : 'blok_sensus', 'kelurahan_desa').map(a => (
+                  <SelectItem key={a} value={a}>{a}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            </div>
              <div className="mt-4 flex items-center justify-between gap-2">
               <div className="text-xs sm:text-sm text-gray-600">
                 Menampilkan <strong>{filteredBusinesses.length}</strong> dari <strong>{businesses.length}</strong> usaha
@@ -559,7 +636,7 @@ export default function ExportTabel() {
               </div>
             </div>
            </CardContent>
-         </Card>
+          </Card>
 
         {/* Table */}
         <Card>
@@ -606,12 +683,12 @@ export default function ExportTabel() {
                         className="h-auto p-0 font-semibold text-xs sm:text-sm"
                         onClick={() => handleSort('kecamatan')}
                       >
-                         Kecamatan
-                         <ArrowUpDown className="ml-2 h-4 w-4" />
+                           Kecamatan
+                           <ArrowUpDown className="ml-2 h-4 w-4" />
                       </Button>
                     </TableHead>
                     <TableHead className="hidden lg:table-cell text-xs sm:text-sm">
-                      Kelurahan/Desa
+                       Kelurahan/Desa
                     </TableHead>
                     <TableHead className="hidden md:table-cell text-xs sm:text-sm">SLS</TableHead>
                     <TableHead className="hidden lg:table-cell text-xs sm:text-sm">Sumber Data</TableHead>
